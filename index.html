@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="https://rbrdingenierie-ui.github.io/accueil_outils/favicon.svg">
+<link rel="apple-touch-icon" href="https://rbrdingenierie-ui.github.io/accueil_outils/favicon.svg">
+<title>Mon memory</title>
+<style>
+  :root {
+    --navy: #1F3864;
+    --navy-soft: #4A5C82;
+    --gold: #B08D57;
+    --rouge: #C0392B;
+    --rouge-soft: #FBE5E2;
+    --orange: #E0591F;
+    --orange-soft: #FBEAE3;
+    --teal: #168F7F;
+    --teal-soft: #E3F3F1;
+    --vert: #277649;
+    --vert-soft: #E4F3EA;
+    --bg: #F7F8FA;
+    --white: #FFFFFF;
+    --track: #8592B0;
+    --a11y-scale: 1;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; background: var(--bg); font-family: Arial, Helvetica, sans-serif; color: var(--navy); }
+  body { display:flex; justify-content:center; padding: 32px 16px 60px; }
+  .page { width:100%; max-width: 720px; }
+
+  header { text-align:center; margin-bottom: 20px; }
+  header h1 { font-size: calc(clamp(24px, 5vw, 30px) * var(--a11y-scale)); margin: 0 0 8px 0; }
+  header p { font-size: calc(15px * var(--a11y-scale)); color: var(--navy-soft); margin:0; }
+
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 3px solid var(--navy) !important;
+    outline-offset: 2px;
+  }
+
+  .skip-link {
+    position:absolute; left:-9999px; top:0; z-index:1000;
+    background:var(--navy); color:#FFFFFF; font-family:inherit; font-weight:700; font-size:14px;
+    padding:12px 20px; border-radius:0 0 10px 0; text-decoration:none;
+  }
+  .skip-link:focus { left:0; }
+
+  .back-to-hub {
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:14px; font-weight:700; color:var(--navy);
+    background:#FFFFFF; border:2px solid var(--track); border-radius:999px;
+    padding:10px 18px; text-decoration:none; margin-bottom:16px; min-height:24px;
+  }
+  .back-to-hub:hover { border-color:var(--navy-soft); }
+  body.a11y-contrast .back-to-hub { border-color:#000000; color:#000000; }
+
+  .a11y-bar {
+    display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap;
+    background: var(--white); border:2px solid var(--track); border-radius:14px;
+    padding: 12px 16px; margin-bottom: 24px;
+  }
+  .a11y-bar-label { font-size:13px; font-weight:800; color: var(--navy); margin-right:4px; }
+  .a11y-toggle-btn {
+    font-family:inherit; font-size:13px; font-weight:700; color: var(--navy-soft);
+    background: var(--white); border:2px solid var(--track); border-radius:999px;
+    padding: 8px 14px; cursor:pointer; min-height:24px;
+  }
+  .a11y-toggle-btn:hover { border-color: var(--navy-soft); }
+  .a11y-toggle-btn[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color:#FFFFFF; }
+  .a11y-size-group { display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700; color: var(--navy); }
+  .a11y-size-group button {
+    font-family:inherit; font-weight:800; font-size:14px; color: var(--navy);
+    background: var(--white); border:2px solid var(--navy-soft); border-radius:8px;
+    width:34px; height:34px; cursor:pointer;
+  }
+  .a11y-size-group button:hover { border-color: var(--navy); }
+
+  body.a11y-font, body.a11y-font * { font-family: Verdana, Geneva, sans-serif !important; }
+  body.a11y-font .tile-text[data-custom-font="1"] { font-family: inherit !important; }
+
+  .falc-simple-content { display:none; }
+  body.falc-mode .falc-normal-content { display:none; }
+  body.falc-mode .falc-simple-content { display:block; }
+  .falc-simple-content p { font-size: calc(16px * var(--a11y-scale)); line-height: 2; color:#000000; }
+
+  body.a11y-contrast { background:#FFFFFF; }
+  body.a11y-contrast .panel, body.a11y-contrast .a11y-bar, body.a11y-contrast .deck-item { border-color:#000000 !important; }
+  body.a11y-contrast header p, body.a11y-contrast .field-hint, body.a11y-contrast .empty-msg { color:#000000 !important; }
+
+  /* ---------- onglets ---------- */
+  .tabs { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:22px; }
+  .tab-btn {
+    font-family:inherit; font-size:calc(14px * var(--a11y-scale)); font-weight:700; color:var(--navy-soft);
+    background:var(--white); border:2px solid var(--track); border-radius:999px;
+    padding:11px 18px; cursor:pointer; min-height:44px;
+  }
+  .tab-btn:hover { border-color:var(--navy-soft); }
+  .tab-btn.active { background:var(--navy); border-color:var(--navy); color:#FFFFFF; }
+  .tab-panel { display:none; }
+  .tab-panel.active { display:block; }
+
+  /* ---------- panneaux ---------- */
+  .panel {
+    background:var(--white); border:2px solid var(--track); border-radius:18px;
+    padding:22px; margin-bottom:20px;
+  }
+  .panel-title { font-size:calc(16px * var(--a11y-scale)); font-weight:800; color:var(--navy); margin-bottom:14px; }
+  .lede { font-size:calc(14.5px * var(--a11y-scale)); color:var(--navy-soft); line-height:1.6; margin:0 0 14px; }
+
+  .field-block { margin-bottom:16px; }
+  .field-label { display:block; font-size:calc(13.5px * var(--a11y-scale)); font-weight:800; color:var(--navy); margin-bottom:6px; }
+  .field-hint { display:block; font-size:calc(12px * var(--a11y-scale)); color:var(--navy-soft); margin-top:5px; line-height:1.45; }
+  .field-input, .field-select, .field-textarea {
+    width:100%; font-family:inherit; font-size:calc(15px * var(--a11y-scale)); color:var(--navy);
+    border:2px solid var(--track); border-radius:12px; padding:11px 14px; background:var(--white);
+    min-height:44px;
+  }
+  .field-textarea { min-height:90px; resize:vertical; line-height:1.5; }
+  .field-input:focus, .field-select:focus, .field-textarea:focus { outline:none; border-color:var(--navy); }
+  .field-row { display:flex; gap:12px; flex-wrap:wrap; }
+  .field-row > * { flex:1; min-width:150px; }
+
+  .btn-primary {
+    font-family:inherit; font-size:calc(15px * var(--a11y-scale)); font-weight:700; color:#FFFFFF;
+    background:var(--navy); border:none; border-radius:12px; padding:13px 22px; cursor:pointer; min-height:44px;
+  }
+  .btn-primary:hover { filter:brightness(1.15); }
+  .btn-secondary {
+    font-family:inherit; font-size:calc(14px * var(--a11y-scale)); font-weight:700; color:var(--navy);
+    background:var(--white); border:2px solid var(--track); border-radius:12px; padding:11px 18px; cursor:pointer; min-height:44px;
+  }
+  .btn-secondary:hover { border-color:var(--navy); }
+  .btn-danger {
+    font-family:inherit; font-size:calc(13.5px * var(--a11y-scale)); font-weight:700; color:var(--rouge);
+    background:var(--rouge-soft); border:2px solid var(--rouge); border-radius:12px; padding:11px 18px; cursor:pointer; min-height:44px;
+  }
+  .btn-danger:hover { background:var(--rouge); color:#FFFFFF; }
+  .btn-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; }
+
+  /* ---------- mode de jeu ---------- */
+  .mode-options { display:flex; gap:12px; flex-wrap:wrap; }
+  .mode-option { flex:1; min-width:150px; position:relative; }
+  .mode-option input[type="radio"] { position:absolute; opacity:0; width:100%; height:100%; margin:0; cursor:pointer; }
+  .mode-option label {
+    display:flex; flex-direction:column; align-items:center; gap:6px; text-align:center;
+    border:2px solid var(--track); border-radius:14px; padding:16px 12px; cursor:pointer;
+    font-size:calc(13.5px * var(--a11y-scale)); font-weight:700; color:var(--navy-soft); min-height:44px;
+  }
+  .mode-option .mode-icon { font-size:24px; }
+  .mode-option .mode-desc { font-size:calc(11.5px * var(--a11y-scale)); font-weight:400; line-height:1.4; }
+  .mode-option input[type="radio"]:checked + label { border-color:var(--navy); background:var(--teal-soft); color:var(--navy); }
+  .mode-option input[type="radio"]:focus-visible + label { outline:3px solid var(--navy); outline-offset:2px; }
+
+  /* ---------- personnalisation ---------- */
+  .style-row { display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; }
+  .style-group { flex:1; min-width:140px; }
+  .color-swatches { display:flex; gap:8px; flex-wrap:wrap; }
+  .color-swatch { width:38px; height:38px; border-radius:10px; border:3px solid transparent; cursor:pointer; padding:0; }
+  .color-swatch.selected { border-color:var(--navy); }
+  .color-swatch:focus-visible { outline:3px solid var(--navy); outline-offset:2px; }
+  .custom-color-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:10px; }
+  .custom-color-label { font-size:calc(12.5px * var(--a11y-scale)); font-weight:700; color:var(--navy-soft); }
+  .custom-color-input {
+    width:52px; height:38px; padding:2px; border:2px solid var(--track); border-radius:10px;
+    background:var(--white); cursor:pointer;
+  }
+  .custom-color-input:focus-visible { outline:3px solid var(--navy); outline-offset:2px; }
+
+  /* ---------- liste des paires ---------- */
+  .pair-list { display:flex; flex-direction:column; gap:12px; margin-top:16px; }
+  .pair-item { border:2px solid var(--track); border-radius:14px; padding:14px 16px; background:var(--bg); }
+  .pair-a { font-size:calc(14.5px * var(--a11y-scale)); font-weight:700; color:var(--navy); margin-bottom:4px; word-break:break-word; }
+  .pair-b { font-size:calc(13.5px * var(--a11y-scale)); color:var(--navy-soft); line-height:1.5; word-break:break-word; }
+  .pair-img { font-size:calc(12px * var(--a11y-scale)); color:var(--teal); margin-top:5px; }
+  .pair-actions { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mini-btn {
+    font-family:inherit; font-size:calc(12.5px * var(--a11y-scale)); font-weight:700; color:var(--navy);
+    background:var(--white); border:2px solid var(--track); border-radius:999px;
+    padding:8px 14px; cursor:pointer; min-height:36px;
+  }
+  .mini-btn:hover { border-color:var(--navy); }
+  .mini-btn.danger { color:var(--rouge); border-color:var(--rouge-soft); }
+  .mini-btn.danger:hover { background:var(--rouge); color:#FFFFFF; border-color:var(--rouge); }
+
+  .empty-msg { text-align:center; font-size:calc(13.5px * var(--a11y-scale)); color:var(--navy-soft); font-style:italic; padding:18px 10px; }
+
+  /* ---------- onglets explicatifs ---------- */
+  .principe-list { margin:0; padding-left:22px; }
+  .principe-list li {
+    font-size:calc(14px * var(--a11y-scale)); color:var(--navy-soft); line-height:1.65; margin-bottom:12px;
+  }
+  .principe-list li strong { color:var(--navy); }
+
+  /* 4 conseils : 2x2 sur ecran large, une colonne sur mobile (auto-fit donnait 3+1, desequilibre) */
+  .conseil-grid { display:grid; grid-template-columns:repeat(2, 1fr); gap:14px; margin-top:16px; }
+  @media (max-width: 560px) { .conseil-grid { grid-template-columns:1fr; } }
+  .conseil-card { border-radius:14px; padding:16px 16px 18px; border-top:5px solid; background:var(--bg); }
+  .conseil-1 { border-top-color:#3A3A3A; }
+  .conseil-2 { border-top-color:var(--teal); }
+  .conseil-3 { border-top-color:var(--gold); }
+  .conseil-4 { border-top-color:var(--orange); }
+  .conseil-icon { font-size:26px; margin-bottom:8px; }
+  .conseil-title {
+    font-size:calc(13.5px * var(--a11y-scale)); font-weight:800; color:var(--navy);
+    text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; line-height:1.3;
+  }
+  .conseil-text { font-size:calc(13px * var(--a11y-scale)); color:var(--navy-soft); line-height:1.55; }
+
+  .how-step { display:flex; gap:14px; align-items:flex-start; margin-bottom:18px; }
+  .how-num {
+    flex-shrink:0; width:32px; height:32px; border-radius:50%;
+    background:var(--navy); color:#FFFFFF; font-weight:800; font-size:15px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .how-body { flex:1; min-width:0; }
+  .how-title { font-size:calc(14.5px * var(--a11y-scale)); font-weight:800; color:var(--navy); margin-bottom:5px; }
+  .how-body p { font-size:calc(13.5px * var(--a11y-scale)); color:var(--navy-soft); line-height:1.6; margin:0; }
+  .how-body p strong { color:var(--navy); }
+  body.a11y-contrast .conseil-card { background:#FFFFFF; border:2px solid #000000; border-top-width:5px; }
+  body.a11y-contrast .conseil-text, body.a11y-contrast .principe-list li, body.a11y-contrast .how-body p { color:#000000 !important; }
+
+  /* ---------- paquets ---------- */
+  .deck-list { display:flex; flex-direction:column; gap:10px; }
+  .deck-item {
+    display:flex; align-items:center; gap:12px; justify-content:space-between;
+    border:2px solid var(--track); border-radius:14px; padding:14px 16px; background:var(--white);
+    cursor:pointer; text-align:left; width:100%; font-family:inherit; min-height:44px;
+  }
+  .deck-item:hover { border-color:var(--navy); }
+  .deck-info { flex:1; min-width:0; }
+  .deck-name { font-size:calc(14.5px * var(--a11y-scale)); font-weight:800; color:var(--navy); word-break:break-word; }
+  .deck-count { font-size:calc(12.5px * var(--a11y-scale)); color:var(--navy-soft); margin-top:2px; }
+  .deck-tag {
+    display:inline-block; font-size:calc(11.5px * var(--a11y-scale)); font-weight:700; color:#FFFFFF;
+    border-radius:999px; padding:4px 10px; margin-bottom:5px;
+  }
+
+  /* ---------- plateau de jeu ---------- */
+  .game-stats {
+    display:flex; gap:16px; justify-content:center; flex-wrap:wrap; margin-bottom:16px;
+    font-size:calc(13.5px * var(--a11y-scale)); font-weight:700; color:var(--navy);
+  }
+  .game-stat { background:var(--bg); border-radius:999px; padding:8px 16px; border:2px solid var(--track); }
+
+  .board { display:grid; gap:10px; margin-bottom:18px; }
+  .tile {
+    position:relative; aspect-ratio:1; min-height:76px;
+    border:3px solid var(--track); border-radius:14px; background:var(--navy);
+    display:flex; align-items:center; justify-content:center; padding:8px;
+    cursor:pointer; font-family:inherit; overflow:hidden;
+  }
+  .tile:hover:not(.matched):not(.revealed) { border-color:var(--gold); }
+  .tile:focus-visible { outline:3px solid var(--gold); outline-offset:3px; }
+  .tile-back { font-size:26px; color:#FFFFFF; }
+  .tile.revealed, .tile.matched { background:var(--white); }
+  .tile.matched { border-color:var(--vert); background:var(--vert-soft); }
+  .tile-content { display:none; width:100%; height:100%; align-items:center; justify-content:center; flex-direction:column; gap:4px; }
+  .tile.revealed .tile-content, .tile.matched .tile-content { display:flex; }
+  .tile.revealed .tile-back, .tile.matched .tile-back { display:none; }
+  .tile-text {
+    font-size:calc(13px * var(--a11y-scale)); font-weight:700; text-align:center;
+    line-height:1.3; word-break:break-word; overflow:hidden; max-height:100%;
+  }
+  .tile-img { max-width:100%; max-height:100%; object-fit:contain; border-radius:8px; }
+  .tile-img-error { font-size:calc(10px * var(--a11y-scale)); color:var(--rouge); text-align:center; line-height:1.3; }
+  .tile.matched::after {
+    content:'✓'; position:absolute; top:4px; right:7px;
+    font-size:15px; color:var(--vert); font-weight:800;
+  }
+
+  .game-done {
+    text-align:center; padding:26px 20px;
+    background:var(--vert-soft); border:2px solid var(--vert); border-radius:16px;
+  }
+  .game-done-title { font-size:calc(19px * var(--a11y-scale)); font-weight:800; color:var(--vert); margin-bottom:8px; }
+  .game-done-text { font-size:calc(14px * var(--a11y-scale)); color:var(--navy); line-height:1.5; margin-bottom:16px; }
+
+  /* ---------- import ---------- */
+  .import-preview {
+    font-size:calc(13px * var(--a11y-scale)); color:var(--navy); margin-top:10px;
+    background:var(--bg); border-radius:10px; padding:12px 14px; line-height:1.5;
+  }
+  .import-preview.error { color:var(--rouge); background:var(--rouge-soft); }
+  .template-box {
+    background:var(--bg); border:2px dashed var(--track); border-radius:12px;
+    padding:14px 16px; font-family:Consolas, monospace; font-size:calc(12.5px * var(--a11y-scale));
+    color:var(--navy); line-height:1.7; margin:10px 0 14px; overflow-x:auto; white-space:pre;
+  }
+
+  /* ---------- indicateur de sauvegarde ---------- */
+  .save-indicator {
+    position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(12px);
+    background:var(--vert-soft); color:var(--vert); border:2px solid var(--vert);
+    border-radius:999px; padding:9px 20px; font-size:13.5px; font-weight:700;
+    opacity:0; pointer-events:none; transition:opacity 0.25s ease, transform 0.25s ease; z-index:1500;
+  }
+  .save-indicator.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  .save-indicator.save-error { background:var(--rouge-soft); color:var(--rouge); border-color:var(--rouge); }
+  @media (prefers-reduced-motion: reduce) { .save-indicator { transition:none; } }
+
+  .sr-only {
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden;
+    clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
+
+  footer { text-align:center; font-size:calc(12px * var(--a11y-scale)); color: var(--navy-soft); margin-top: 26px; }
+
+  @media print {
+    .a11y-bar, .tabs, .back-to-hub, .skip-link, .save-indicator, .btn-row, .pair-actions { display:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Aller directement au contenu</a>
+
+<div class="page">
+  <a href="https://rbrdingenierie-ui.github.io/accueil_outils/" class="back-to-hub"><span aria-hidden="true">←</span> Retour à mon espace</a>
+
+  <div class="a11y-bar" role="region" aria-label="Options d'accessibilité">
+    <span class="a11y-bar-label">♿ Accessibilité</span>
+    <button type="button" id="a11yFontBtn" class="a11y-toggle-btn" aria-pressed="false">🔤 Police adaptée</button>
+    <button type="button" id="a11yContrastBtn" class="a11y-toggle-btn" aria-pressed="false">◐ Contraste renforcé</button>
+    <button type="button" id="falcModeBtn" class="a11y-toggle-btn" aria-pressed="false" title="Facile à Lire et à Comprendre : simplifie le texte de la page">📖 Mode FALC</button>
+    <button type="button" id="hoverReadBtn" class="a11y-toggle-btn" aria-pressed="false" title="Lit à voix haute le contenu de la page quand la souris passe dessus">🔊 Lecture au survol</button>
+    <div class="a11y-size-group" role="group" aria-label="Taille du texte">
+      <span>Taille du texte</span>
+      <button type="button" id="a11ySizeDown" aria-label="Réduire la taille du texte">A−</button>
+      <button type="button" id="a11ySizeReset" aria-label="Taille du texte par défaut">A</button>
+      <button type="button" id="a11ySizeUp" aria-label="Agrandir la taille du texte">A+</button>
+    </div>
+  </div>
+
+  <main id="main" tabindex="-1">
+  <header>
+    <h1><span aria-hidden="true">🎴</span> Mon memory</h1>
+    <div class="falc-normal-content"><p>Créez vos paires de cartes, puis retrouvez-les de mémoire pour ancrer vos notions.</p></div>
+    <div class="falc-simple-content"><p>Créez des paires de cartes.<br>Puis retrouvez-les de mémoire.<br>Cela aide à retenir.</p></div>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Sections de l'outil">
+    <button class="tab-btn active" data-tab="pourquoi" role="tab" aria-selected="true" aria-controls="panel-pourquoi" id="tabbtn-pourquoi">💡 À quoi ça sert</button>
+    <button class="tab-btn" data-tab="comment" role="tab" aria-selected="false" aria-controls="panel-comment" id="tabbtn-comment">⚙️ Comment ça fonctionne</button>
+    <button class="tab-btn" data-tab="creer" role="tab" aria-selected="false" aria-controls="panel-creer" id="tabbtn-creer">✏️ Créer mes paires</button>
+    <button class="tab-btn" data-tab="jouer" role="tab" aria-selected="false" aria-controls="panel-jouer" id="tabbtn-jouer">🎮 Jouer</button>
+    <button class="tab-btn" data-tab="importer" role="tab" aria-selected="false" aria-controls="panel-importer" id="tabbtn-importer">📥 Importer</button>
+  </div>
+
+  <!-- ============ ONGLET : A QUOI CA SERT ============ -->
+  <div class="tab-panel active" id="panel-pourquoi" role="tabpanel" aria-labelledby="tabbtn-pourquoi" tabindex="0">
+    <div class="panel">
+      <div class="panel-title">💡 Qu'est-ce qu'un memory pédagogique ?</div>
+      <div class="falc-normal-content">
+        <p class="lede">Le memory est un jeu d'association : on retourne deux cartes et on cherche à retrouver les paires. Appliqué aux révisions, il transforme la mémorisation en jeu — associer une date à un événement, un mot à sa traduction, une formule à son usage.</p>
+      </div>
+      <div class="falc-simple-content">
+        <p>Le memory est un jeu de paires.<br>On retourne deux cartes.<br>On cherche celles qui vont ensemble.<br>Cela aide à retenir ses cours.</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">🧠 Pourquoi ça marche</div>
+      <div class="falc-normal-content">
+        <ol class="principe-list">
+          <li><strong>Apprentissage par association</strong> — relier deux informations entre elles crée un lien durable en mémoire, bien plus solide qu'une notion isolée.</li>
+          <li><strong>Effort de récupération</strong> — chercher où se trouve la carte correspondante oblige le cerveau à travailler, contrairement à une relecture passive.</li>
+          <li><strong>Mémoire spatiale</strong> — retenir la position des cartes mobilise une mémoire différente, qui vient s'ajouter à la mémorisation du contenu.</li>
+          <li><strong>Répétition sans lassitude</strong> — au fil d'une partie, on voit chaque carte plusieurs fois. Le jeu fait répéter naturellement, sans l'ennui d'une relecture.</li>
+          <li><strong>Feedback immédiat</strong> — on sait tout de suite si l'association est juste, ce qui permet de corriger une erreur avant qu'elle ne s'installe.</li>
+          <li><strong>Motivation par le jeu</strong> — chercher à battre son nombre d'essais transforme la révision en défi, et l'on y revient plus volontiers.</li>
+        </ol>
+      </div>
+      <div class="falc-simple-content">
+        <p>1. Relier deux choses aide à les retenir.</p>
+        <p>2. Chercher la bonne carte fait travailler la mémoire.</p>
+        <p>3. On retient aussi où sont les cartes.</p>
+        <p>4. On revoit les cartes plusieurs fois, sans s'ennuyer.</p>
+        <p>5. On sait tout de suite si on a bon.</p>
+        <p>6. C'est un jeu : on a envie de recommencer.</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">✅ Un bon jeu de memory</div>
+      <div class="falc-normal-content">
+        <p class="lede">Quelques repères pour que le jeu serve vraiment vos révisions.</p>
+      </div>
+      <div class="falc-simple-content">
+        <p>Voici 4 conseils.</p>
+      </div>
+      <div class="conseil-grid">
+        <div class="conseil-card conseil-1">
+          <div class="conseil-icon" aria-hidden="true">✂️</div>
+          <div class="conseil-title">Des cartes courtes</div>
+          <div class="conseil-text falc-normal-content">Une carte de memory se lit d'un coup d'œil. Privilégiez un mot, une date, une formule — pas une phrase entière, qui serait illisible sur une petite carte.</div>
+          <div class="conseil-text falc-simple-content">Écrivez peu de mots par carte.<br>Sinon on ne peut pas lire.</div>
+        </div>
+        <div class="conseil-card conseil-2">
+          <div class="conseil-icon" aria-hidden="true">🔗</div>
+          <div class="conseil-title">Des associations claires</div>
+          <div class="conseil-text falc-normal-content">Chaque paire doit être évidente une fois trouvée : une date et son événement, un terme et sa définition. Si l'association est ambiguë, elle sème le doute plutôt qu'elle n'ancre.</div>
+          <div class="conseil-text falc-simple-content">Les deux cartes doivent bien aller ensemble.<br>Sans hésitation possible.</div>
+        </div>
+        <div class="conseil-card conseil-3">
+          <div class="conseil-icon" aria-hidden="true">🎯</div>
+          <div class="conseil-title">6 à 10 paires</div>
+          <div class="conseil-text falc-normal-content">En dessous de 6 paires, le jeu est trop facile pour faire travailler la mémoire. Au-delà de 10, la partie devient longue et décourageante. Créez plusieurs jeux par chapitre plutôt qu'un seul énorme.</div>
+          <div class="conseil-text falc-simple-content">Faites entre 6 et 10 paires.<br>Sinon c'est trop court ou trop long.</div>
+        </div>
+        <div class="conseil-card conseil-4">
+          <div class="conseil-icon" aria-hidden="true">🎨</div>
+          <div class="conseil-title">Images et couleurs</div>
+          <div class="conseil-text falc-normal-content">Une image marque la mémoire visuelle bien plus qu'un texte seul. Les couleurs aident aussi à distinguer les jeux d'une matière à l'autre.</div>
+          <div class="conseil-text falc-simple-content">Ajoutez des images.<br>Utilisez des couleurs.<br>Cela aide à retenir.</div>
+        </div>
+      </div>
+      <div class="btn-row" style="justify-content:center; margin-top:20px;">
+        <button type="button" class="btn-primary" data-goto="creer">Créer mes paires →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ONGLET : COMMENT CA FONCTIONNE ============ -->
+  <div class="tab-panel" id="panel-comment" role="tabpanel" aria-labelledby="tabbtn-comment" tabindex="0">
+    <div class="panel">
+      <div class="panel-title">⚙️ Comment utiliser cet outil</div>
+      <div class="falc-normal-content"><p class="lede">Quelques repères pour créer vos jeux et vous entraîner.</p></div>
+      <div class="falc-simple-content"><p>Voici comment faire.<br>Il y a 5 étapes.</p></div>
+
+      <div class="how-step">
+        <span class="how-num" aria-hidden="true">1</span>
+        <div class="how-body">
+          <div class="how-title">Nommez votre jeu</div>
+          <div class="falc-normal-content"><p>Indiquez une matière et un chapitre : vos paires seront rangées automatiquement. Changez ces champs pour commencer un nouveau jeu, ou pour revenir à un jeu existant.</p></div>
+          <div class="falc-simple-content"><p>Écrivez la matière et le chapitre.<br>Vos paires seront rangées ensemble.</p></div>
+        </div>
+      </div>
+
+      <div class="how-step">
+        <span class="how-num" aria-hidden="true">2</span>
+        <div class="how-body">
+          <div class="how-title">Choisissez le type de jeu</div>
+          <div class="falc-normal-content"><p>Deux possibilités. <strong>Paires identiques</strong> : le même mot apparaît sur les deux cartes, utile pour du vocabulaire ou des images. <strong>Question / réponse</strong> : il faut associer une notion à sa définition, plus exigeant et plus formateur.</p></div>
+          <div class="falc-simple-content"><p>Deux choix :<br>— le même mot sur deux cartes<br>— ou une question et sa réponse.</p></div>
+        </div>
+      </div>
+
+      <div class="how-step">
+        <span class="how-num" aria-hidden="true">3</span>
+        <div class="how-body">
+          <div class="how-title">Ajoutez vos paires</div>
+          <div class="falc-normal-content"><p>Écrivez le contenu des cartes, choisissez la police et la couleur. Vous pouvez ajouter une image, par son adresse web ou depuis votre appareil.</p></div>
+          <div class="falc-simple-content"><p>Écrivez vos cartes.<br>Choisissez la couleur.<br>Vous pouvez ajouter une image.</p></div>
+        </div>
+      </div>
+
+      <div class="how-step">
+        <span class="how-num" aria-hidden="true">4</span>
+        <div class="how-body">
+          <div class="how-title">Jouez</div>
+          <div class="falc-normal-content"><p>Les cartes sont mélangées à chaque partie. Retournez-en deux : si elles vont ensemble, elles restent visibles. Le compteur d'essais vous permet de vous défier d'une partie à l'autre. Le jeu fonctionne aussi au clavier.</p></div>
+          <div class="falc-simple-content"><p>Retournez deux cartes.<br>Si elles vont ensemble, c'est gagné.<br>Essayez de faire moins d'essais.</p></div>
+        </div>
+      </div>
+
+      <div class="how-step">
+        <span class="how-num" aria-hidden="true">5</span>
+        <div class="how-body">
+          <div class="how-title">Importez ou exportez</div>
+          <div class="falc-normal-content"><p>Pour créer beaucoup de paires d'un coup, préparez-les dans un tableur et importez le fichier. Un modèle est téléchargeable dans l'onglet « Importer ».</p></div>
+          <div class="falc-simple-content"><p>Vous pouvez importer beaucoup de paires d'un coup.<br>Utilisez le modèle à télécharger.</p></div>
+        </div>
+      </div>
+
+      <div class="btn-row" style="justify-content:center; margin-top:20px;">
+        <button type="button" class="btn-primary" data-goto="creer">Créer mes paires →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ONGLET : CREER ============ -->
+  <div class="tab-panel" id="panel-creer" role="tabpanel" aria-labelledby="tabbtn-creer" tabindex="0">
+
+    <div class="panel">
+      <div class="panel-title">📚 Le jeu de cartes</div>
+      <div class="field-row">
+        <div class="field-block">
+          <label class="field-label" for="matiereInput">Matière</label>
+          <input type="text" id="matiereInput" class="field-input" placeholder="Ex : Histoire" autocomplete="off" list="matieresListe">
+          <datalist id="matieresListe"></datalist>
+        </div>
+        <div class="field-block">
+          <label class="field-label" for="chapitreInput">Chapitre</label>
+          <input type="text" id="chapitreInput" class="field-input" placeholder="Ex : La Révolution française" autocomplete="off">
+        </div>
+      </div>
+      <span class="field-hint">Vos paires seront rangées sous cette matière et ce chapitre.</span>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">🎯 Type de jeu</div>
+      <div class="mode-options" role="radiogroup" aria-label="Type d'association">
+        <div class="mode-option">
+          <input type="radio" name="gameMode" id="modeIdentique" value="identique" checked>
+          <label for="modeIdentique">
+            <span class="mode-icon" aria-hidden="true">👯</span>
+            Paires identiques
+            <span class="mode-desc">Le même mot ou la même image apparaît deux fois</span>
+          </label>
+        </div>
+        <div class="mode-option">
+          <input type="radio" name="gameMode" id="modeAssociation" value="association">
+          <label for="modeAssociation">
+            <span class="mode-icon" aria-hidden="true">🔗</span>
+            Question / réponse
+            <span class="mode-desc">Associer une notion à sa définition</span>
+          </label>
+        </div>
+      </div>
+      <span class="field-hint">Ce choix s'applique au jeu de cartes en cours de création.</span>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">🎨 Apparence des cartes</div>
+      <div class="style-row">
+        <div class="style-group">
+          <label class="field-label" for="fontSelect">Police</label>
+          <select id="fontSelect" class="field-select">
+            <option value="'Arial','Helvetica',sans-serif">Arial (par défaut)</option>
+            <option value="'Verdana','Geneva',sans-serif">Verdana ♿ (recommandée)</option>
+            <option value="'Georgia','Times New Roman',serif">Georgia</option>
+            <option value="'Courier New','Consolas',monospace">Courier New</option>
+            <option value="'Comic Sans MS','Comic Sans',cursive">Comic Sans MS</option>
+            <option value="'Impact','Arial Narrow',sans-serif">Impact</option>
+            <option value="'Brush Script MT',cursive">Brush Script</option>
+            <option value="'Times New Roman',Times,serif">Times New Roman</option>
+            <option value="'Trebuchet MS','Lucida Sans Unicode','Lucida Grande',sans-serif">Trebuchet MS</option>
+            <option value="'Century Gothic',Futura,Avantgarde,sans-serif">Century Gothic</option>
+            <option value="Rockwell,Georgia,serif">Rockwell</option>
+            <option value="'Segoe Print','Bradley Hand','Comic Sans MS',cursive">Segoe Print</option>
+            <option value="'Palatino Linotype','Book Antiqua',Palatino,'Times New Roman',serif">Palatino</option>
+          </select>
+          <span class="field-hint">Verdana est recommandée pour sa lisibilité.</span>
+        </div>
+        <div class="style-group">
+          <label class="field-label" id="couleurLabel">Couleur du texte</label>
+          <div class="color-swatches" role="radiogroup" aria-labelledby="couleurLabel" id="colorSwatches"></div>
+          <div class="custom-color-row">
+            <label class="custom-color-label" for="customColorInput">Autre couleur :</label>
+            <input type="color" id="customColorInput" class="custom-color-input" value="#1F3864" aria-label="Choisir une couleur personnalisée">
+            <button type="button" class="mini-btn" id="addColorBtn">+ Ajouter</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">➕ Ajouter une paire</div>
+      <div class="field-block">
+        <label class="field-label" for="carteAInput" id="labelCarteA">Le mot ou la notion</label>
+        <textarea id="carteAInput" class="field-textarea" placeholder="Ex : 1789"></textarea>
+      </div>
+      <div class="field-block" id="blockCarteB" hidden>
+        <label class="field-label" for="carteBInput">La réponse à associer</label>
+        <textarea id="carteBInput" class="field-textarea" placeholder="Ex : Prise de la Bastille"></textarea>
+      </div>
+      <div class="field-block">
+        <label class="field-label" for="imageUrlInput">Image (facultatif) — adresse web</label>
+        <input type="url" id="imageUrlInput" class="field-input" placeholder="https://..." autocomplete="off">
+        <span class="field-hint">Certains sites empêchent l'affichage de leurs images ailleurs : si rien ne s'affiche, importez plutôt le fichier ci-dessous.</span>
+      </div>
+      <div class="field-block">
+        <label class="field-label" for="imageFileInput">Image (facultatif) — depuis mon appareil</label>
+        <input type="file" id="imageFileInput" class="field-input" accept="image/*">
+        <span class="field-hint">L'image est réduite automatiquement pour économiser la mémoire du navigateur.</span>
+      </div>
+      <div class="btn-row">
+        <button type="button" class="btn-primary" id="addPairBtn">Ajouter la paire</button>
+        <button type="button" class="btn-secondary" id="clearFormBtn">Vider le formulaire</button>
+      </div>
+      <p class="import-preview" id="addFeedback" hidden></p>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">🗂️ Les paires de ce jeu (<span id="deckCount">0</span>)</div>
+      <div class="pair-list" id="pairList"></div>
+      <div class="btn-row" id="deckActions" hidden>
+        <button type="button" class="btn-secondary" id="playThisBtn">🎮 Jouer avec ce jeu</button>
+        <button type="button" class="btn-secondary" id="exportBtn">💾 Exporter ce jeu</button>
+        <button type="button" class="btn-danger" id="deleteDeckBtn">🗑️ Supprimer ce jeu</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">📦 Tous mes jeux</div>
+      <div class="deck-list" id="deckList"></div>
+    </div>
+  </div>
+
+  <!-- ============ ONGLET 2 : JOUER ============ -->
+  <div class="tab-panel" id="panel-jouer" role="tabpanel" aria-labelledby="tabbtn-jouer" tabindex="0">
+    <div class="panel">
+      <div class="panel-title">🎮 Choisir un jeu</div>
+      <div class="deck-list" id="playDeckList"></div>
+    </div>
+
+    <div class="panel" id="gameZone" hidden>
+      <div class="panel-title" id="gameTitle"></div>
+      <div class="game-stats">
+        <span class="game-stat" id="statPairs">0 / 0 paires</span>
+        <span class="game-stat" id="statTries">0 essai</span>
+      </div>
+      <div class="board" id="board"></div>
+      <div class="btn-row" style="justify-content:center;">
+        <button type="button" class="btn-secondary" id="restartGameBtn">↻ Recommencer</button>
+        <button type="button" class="btn-secondary" id="otherGameBtn">📦 Choisir un autre jeu</button>
+      </div>
+      <p class="field-hint" style="text-align:center; margin-top:12px;">Au clavier : Tab pour vous déplacer, Entrée ou Espace pour retourner une carte.</p>
+    </div>
+
+    <div class="panel" id="gameDone" hidden>
+      <div class="game-done">
+        <div class="game-done-title">🎉 Toutes les paires trouvées !</div>
+        <div class="game-done-text" id="gameDoneText"></div>
+        <div class="btn-row" style="justify-content:center;">
+          <button type="button" class="btn-primary" id="doneRestartBtn">↻ Rejouer</button>
+          <button type="button" class="btn-secondary" id="doneOtherBtn">📦 Choisir un autre jeu</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ONGLET 3 : IMPORTER ============ -->
+  <div class="tab-panel" id="panel-importer" role="tabpanel" aria-labelledby="tabbtn-importer" tabindex="0">
+    <div class="panel">
+      <div class="panel-title">📥 Importer des paires depuis un fichier</div>
+      <p class="lede falc-normal-content">Préparez vos paires dans un tableur ou un fichier texte, puis importez-les d'un coup. Une ligne par paire.</p>
+      <div class="falc-simple-content"><p>Écrivez vos paires dans un fichier.<br>Une ligne = une paire.<br>Puis importez le fichier ici.</p></div>
+
+      <div class="field-block">
+        <span class="field-label">Le format attendu</span>
+        <div class="template-box" id="templateBox">carte A;carte B;image (facultatif)
+1789;Prise de la Bastille;
+1792;Proclamation de la République;
+1804;Sacre de Napoléon;https://exemple.fr/napoleon.jpg</div>
+        <span class="field-hint">Séparez les colonnes par un point-virgule. La première ligne (les titres) est ignorée. En mode « paires identiques », seule la première colonne est utilisée.</span>
+        <div class="btn-row">
+          <button type="button" class="btn-secondary" id="downloadTemplateBtn">⬇️ Télécharger le modèle</button>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-block">
+          <label class="field-label" for="importMatiere">Matière</label>
+          <input type="text" id="importMatiere" class="field-input" placeholder="Ex : Histoire" autocomplete="off">
+        </div>
+        <div class="field-block">
+          <label class="field-label" for="importChapitre">Chapitre</label>
+          <input type="text" id="importChapitre" class="field-input" placeholder="Ex : La Révolution française" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label" for="importMode">Type de jeu</label>
+        <select id="importMode" class="field-select">
+          <option value="association">Question / réponse (deux colonnes)</option>
+          <option value="identique">Paires identiques (première colonne seulement)</option>
+        </select>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label" for="importFile">Votre fichier (.csv ou .txt)</label>
+        <input type="file" id="importFile" class="field-input" accept=".csv,.txt,text/csv,text/plain">
+      </div>
+      <p class="import-preview" id="importFeedback" hidden></p>
+      <div class="btn-row">
+        <button type="button" class="btn-primary" id="importBtn" disabled>Importer les paires</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="save-indicator" id="saveIndicator" role="status" aria-live="polite">✅ Enregistré</div>
+  <div aria-live="polite" class="sr-only" id="liveRegion"></div>
+
+  <footer>Benjamin RICHARD - Tous droits réservés</footer>
+  </main>
+</div>
+
+<script>
+(function () {
+  // ============ accessibilite ============
+  const A11Y_PREFS_KEY = 'memory-a11y-prefs-v1';
+  let a11yPrefs = { font: false, contrast: false, scale: 1, falc: false, hoverRead: false };
+  try {
+    const rawPrefs = localStorage.getItem(A11Y_PREFS_KEY);
+    if (rawPrefs) a11yPrefs = Object.assign(a11yPrefs, JSON.parse(rawPrefs));
+  } catch (e) {}
+  function saveA11yPrefs() {
+    try { localStorage.setItem(A11Y_PREFS_KEY, JSON.stringify(a11yPrefs)); } catch (e) {}
+  }
+  function applyA11yPrefs() {
+    document.body.classList.toggle('a11y-font', a11yPrefs.font);
+    document.body.classList.toggle('a11y-contrast', a11yPrefs.contrast);
+    document.body.classList.toggle('falc-mode', a11yPrefs.falc);
+    document.documentElement.style.setProperty('--a11y-scale', a11yPrefs.scale);
+    document.getElementById('a11yFontBtn').setAttribute('aria-pressed', a11yPrefs.font ? 'true' : 'false');
+    document.getElementById('a11yContrastBtn').setAttribute('aria-pressed', a11yPrefs.contrast ? 'true' : 'false');
+    document.getElementById('falcModeBtn').setAttribute('aria-pressed', a11yPrefs.falc ? 'true' : 'false');
+    document.getElementById('hoverReadBtn').setAttribute('aria-pressed', a11yPrefs.hoverRead ? 'true' : 'false');
+  }
+  document.getElementById('a11yFontBtn').addEventListener('click', () => { a11yPrefs.font = !a11yPrefs.font; applyA11yPrefs(); saveA11yPrefs(); });
+  document.getElementById('a11yContrastBtn').addEventListener('click', () => { a11yPrefs.contrast = !a11yPrefs.contrast; applyA11yPrefs(); saveA11yPrefs(); });
+  document.getElementById('falcModeBtn').addEventListener('click', () => {
+    a11yPrefs.falc = !a11yPrefs.falc;
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    applyA11yPrefs(); saveA11yPrefs();
+  });
+  document.getElementById('hoverReadBtn').addEventListener('click', () => {
+    a11yPrefs.hoverRead = !a11yPrefs.hoverRead;
+    if (!a11yPrefs.hoverRead && window.speechSynthesis) window.speechSynthesis.cancel();
+    applyA11yPrefs(); saveA11yPrefs();
+  });
+  document.getElementById('a11ySizeUp').addEventListener('click', () => { a11yPrefs.scale = Math.min(1.6, Math.round((a11yPrefs.scale + 0.15) * 100) / 100); applyA11yPrefs(); saveA11yPrefs(); });
+  document.getElementById('a11ySizeDown').addEventListener('click', () => { a11yPrefs.scale = Math.max(0.85, Math.round((a11yPrefs.scale - 0.15) * 100) / 100); applyA11yPrefs(); saveA11yPrefs(); });
+  document.getElementById('a11ySizeReset').addEventListener('click', () => { a11yPrefs.scale = 1; applyA11yPrefs(); saveA11yPrefs(); });
+  applyA11yPrefs();
+
+  // ============ lecture au survol ============
+  function getVisibleHoverText(el) {
+    const isFalc = document.body.classList.contains('falc-mode');
+    if (isFalc && el.closest('.falc-normal-content')) return '';
+    if (!isFalc && el.closest('.falc-simple-content')) return '';
+    if (el.tagName === 'SELECT') {
+      const selected = el.options[el.selectedIndex];
+      return (el.getAttribute('aria-label') ? el.getAttribute('aria-label') + ' : ' : '') + (selected ? selected.textContent.trim() : '');
+    }
+    if (el.matches('input, textarea')) {
+      return (el.getAttribute('aria-label') || el.placeholder || '').trim();
+    }
+    const clone = el.cloneNode(true);
+    clone.querySelectorAll(isFalc ? '.falc-normal-content' : '.falc-simple-content').forEach(n => n.remove());
+    clone.querySelectorAll('[aria-hidden="true"], .sr-only').forEach(n => n.remove());
+    const texte = clone.textContent.replace(/\s+/g, ' ').trim();
+    return texte || (el.getAttribute('aria-label') || '').trim();
+  }
+  const hoverReadSupported = 'speechSynthesis' in window;
+  function attachHoverRead(el) {
+    if (!hoverReadSupported || el.dataset.hoverReadAttached) return;
+    el.dataset.hoverReadAttached = '1';
+    el.addEventListener('mouseenter', () => {
+      if (!a11yPrefs.hoverRead) return;
+      window.speechSynthesis.cancel();
+      const text = getVisibleHoverText(el);
+      if (!text) return;
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'fr-FR'; utter.rate = 0.95;
+      window.speechSynthesis.speak(utter);
+    });
+    el.addEventListener('mouseleave', () => { if (window.speechSynthesis) window.speechSynthesis.cancel(); });
+    el.addEventListener('focusin', () => { if (a11yPrefs.hoverRead) el.dispatchEvent(new Event('mouseenter')); });
+    el.addEventListener('focusout', () => { if (window.speechSynthesis) window.speechSynthesis.cancel(); });
+  }
+  const HOVER_READ_SELECTOR = 'h1, .panel-title, .lede, p, li, label, input, select, textarea, .tab-btn, .back-to-hub, .a11y-toggle-btn, .a11y-bar-label, .field-hint, .btn-primary, .btn-secondary, .btn-danger, .mini-btn, .pair-a, .pair-b, .deck-name, .deck-count, .deck-tag, .empty-msg, .game-stat, .game-done-title, .game-done-text, .import-preview, .template-box, .tile, .conseil-title, .conseil-text, .how-title';
+  function attachHoverReadAll(root) {
+    (root || document).querySelectorAll(HOVER_READ_SELECTOR).forEach(attachHoverRead);
+  }
+
+  // ============ onglets ============
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tab = btn.dataset.tab;
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        const isActive = b === btn;
+        b.classList.toggle('active', isActive);
+        b.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + tab));
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+      if (tab === 'jouer') renderPlayDeckList();
+    });
+  });
+  // boutons « Créer mes paires → » depuis les onglets explicatifs
+  document.querySelectorAll('[data-goto]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelector(`.tab-btn[data-tab="${btn.dataset.goto}"]`).click();
+      window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    });
+  });
+
+  // ============ donnees ============
+  const STORAGE_KEY = 'memory-v1';
+  const MATIERE_COLORS = ['#1F3864', '#C9501B', '#138072', '#8C7045', '#8A5CB0', '#C23B6B', '#2E6B9E', '#427D35'];
+  const TEXT_COLORS = ['#1F3864', '#C0392B', '#277649', '#8A5CB0', '#C9501B', '#138072'];
+  const CUSTOM_COLORS_KEY = 'memory-couleurs-perso-v1';
+
+  let pairs = loadPairs();
+  let currentStyle = { font: "'Arial','Helvetica',sans-serif", color: '#1F3864' };
+  let customColors = [];
+  try {
+    const rawColors = localStorage.getItem(CUSTOM_COLORS_KEY);
+    customColors = rawColors ? JSON.parse(rawColors) : [];
+  } catch (e) { customColors = []; }
+  function saveCustomColors() {
+    try { localStorage.setItem(CUSTOM_COLORS_KEY, JSON.stringify(customColors)); } catch (e) {}
+  }
+
+  function loadPairs() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
+  }
+
+  let saveIndicatorTimer = null;
+  function showSaveIndicator(ok, message) {
+    const el = document.getElementById('saveIndicator');
+    if (!el) return;
+    el.textContent = ok ? '✅ Enregistré' : (message || '⚠️ Sauvegarde impossible');
+    el.classList.toggle('save-error', !ok);
+    el.classList.add('show');
+    clearTimeout(saveIndicatorTimer);
+    saveIndicatorTimer = setTimeout(() => el.classList.remove('show'), ok ? 1800 : 4000);
+  }
+
+  function savePairs() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(pairs));
+      showSaveIndicator(true);
+      return true;
+    } catch (e) {
+      showSaveIndicator(false, "⚠️ Mémoire pleine : supprimez des images ou des paires");
+      return false;
+    }
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  }
+  function escapeAttr(s) { return escapeHtml(s); }
+  function announceLive(msg) {
+    document.getElementById('liveRegion').textContent = msg;
+  }
+
+  function matiereColor(matiere) {
+    const nom = (matiere || '').trim().toLowerCase();
+    if (!nom) return MATIERE_COLORS[0];
+    let hash = 0;
+    for (let i = 0; i < nom.length; i++) hash = (hash * 31 + nom.charCodeAt(i)) >>> 0;
+    return MATIERE_COLORS[hash % MATIERE_COLORS.length];
+  }
+  function deckKey(matiere, chapitre) {
+    return (matiere || '').trim() + '||' + (chapitre || '').trim();
+  }
+  function deckLabel(matiere, chapitre) {
+    const m = (matiere || '').trim(), c = (chapitre || '').trim();
+    if (m && c) return c;
+    return c || m || '(sans titre)';
+  }
+
+  // ============ journalisation pour les badges ============
+  function logMemoryActivity(matiere, chapitre, nbPaires) {
+    try {
+      const raw = localStorage.getItem('accueil-activity-v1');
+      const activity = raw ? JSON.parse(raw) : [];
+      activity.push({
+        tool: 'memory',
+        matiere: matiere || '', chapitre: chapitre || '',
+        depth: nbPaires || 0, colors: 0,
+        createdAt: new Date().toISOString()
+      });
+      localStorage.setItem('accueil-activity-v1', JSON.stringify(activity));
+    } catch (e) {}
+  }
+
+  // ============ mode de jeu ============
+  const blockCarteB = document.getElementById('blockCarteB');
+  const labelCarteA = document.getElementById('labelCarteA');
+  function currentMode() {
+    return document.querySelector('input[name="gameMode"]:checked').value;
+  }
+  function applyModeToForm() {
+    const mode = currentMode();
+    blockCarteB.hidden = mode === 'identique';
+    labelCarteA.textContent = mode === 'identique' ? 'Le mot ou la notion' : 'La question ou la notion';
+  }
+  document.querySelectorAll('input[name="gameMode"]').forEach(r => {
+    r.addEventListener('change', applyModeToForm);
+  });
+
+  // ============ personnalisation ============
+  const fontSelect = document.getElementById('fontSelect');
+  const colorSwatches = document.getElementById('colorSwatches');
+
+  function renderColorSwatches() {
+    const toutes = TEXT_COLORS.concat(customColors);
+    colorSwatches.innerHTML = toutes.map((c, i) => {
+      const perso = i >= TEXT_COLORS.length;
+      return `<button type="button" class="color-swatch${c === currentStyle.color ? ' selected' : ''}" data-color="${c}" style="background:${c}" role="radio" aria-checked="${c === currentStyle.color}" aria-label="Couleur ${c}${perso ? ', personnalisée — double-cliquez pour la retirer' : ''}"${perso ? ' data-perso="1" title="Double-cliquez pour retirer cette couleur"' : ''}></button>`;
+    }).join('');
+    colorSwatches.querySelectorAll('.color-swatch').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentStyle.color = btn.dataset.color;
+        renderColorSwatches(); renderPairList();
+      });
+      if (btn.dataset.perso) {
+        btn.addEventListener('dblclick', () => {
+          customColors = customColors.filter(c => c !== btn.dataset.color);
+          saveCustomColors();
+          if (currentStyle.color === btn.dataset.color) currentStyle.color = TEXT_COLORS[0];
+          renderColorSwatches(); renderPairList();
+        });
+      }
+    });
+    attachHoverReadAll(colorSwatches);
+  }
+  document.getElementById('addColorBtn').addEventListener('click', () => {
+    const couleur = document.getElementById('customColorInput').value;
+    if (!TEXT_COLORS.includes(couleur) && !customColors.includes(couleur)) {
+      customColors.push(couleur);
+      saveCustomColors();
+    }
+    currentStyle.color = couleur;
+    renderColorSwatches(); renderPairList();
+  });
+  fontSelect.addEventListener('change', () => {
+    currentStyle.font = fontSelect.value;
+    renderPairList();
+  });
+
+  // ============ creation de paires ============
+  const matiereInput = document.getElementById('matiereInput');
+  const chapitreInput = document.getElementById('chapitreInput');
+  const carteAInput = document.getElementById('carteAInput');
+  const carteBInput = document.getElementById('carteBInput');
+  const imageUrlInput = document.getElementById('imageUrlInput');
+  const imageFileInput = document.getElementById('imageFileInput');
+  const addFeedback = document.getElementById('addFeedback');
+  let pendingImageData = null;
+
+  function showAddFeedback(msg, isError) {
+    addFeedback.textContent = msg;
+    addFeedback.className = 'import-preview' + (isError ? ' error' : '');
+    addFeedback.hidden = false;
+    attachHoverRead(addFeedback);
+  }
+
+  function reduireImage(file, maxDim, callback) {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          const ratio = Math.min(maxDim / width, maxDim / height);
+          width = Math.round(width * ratio); height = Math.round(height * ratio);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        callback(canvas.toDataURL('image/jpeg', 0.72));
+      };
+      img.onerror = () => callback(null);
+      img.src = ev.target.result;
+    };
+    reader.onerror = () => callback(null);
+    reader.readAsDataURL(file);
+  }
+
+  imageFileInput.addEventListener('change', () => {
+    const file = imageFileInput.files && imageFileInput.files[0];
+    if (!file) { pendingImageData = null; return; }
+    reduireImage(file, 500, (dataUrl) => {
+      if (!dataUrl) {
+        pendingImageData = null;
+        showAddFeedback("Ce fichier n'a pas pu être lu. Essayez une autre image.", true);
+        return;
+      }
+      pendingImageData = dataUrl;
+      showAddFeedback('Image prête : elle sera ajoutée à la paire.', false);
+    });
+  });
+
+  document.getElementById('addPairBtn').addEventListener('click', () => {
+    const mode = currentMode();
+    const carteA = carteAInput.value.trim();
+    const carteB = mode === 'identique' ? carteA : carteBInput.value.trim();
+    const matiere = matiereInput.value.trim();
+    const chapitre = chapitreInput.value.trim();
+    const image = pendingImageData || imageUrlInput.value.trim() || '';
+
+    if (!carteA && !image) {
+      showAddFeedback('Écrivez un mot ou ajoutez une image avant de créer la paire.', true);
+      carteAInput.focus();
+      return;
+    }
+    if (mode === 'association' && !carteB) {
+      showAddFeedback('En mode question / réponse, les deux cartes doivent être remplies.', true);
+      carteBInput.focus();
+      return;
+    }
+    if (!matiere && !chapitre) {
+      showAddFeedback('Indiquez au moins une matière ou un chapitre, pour ranger la paire.', true);
+      matiereInput.focus();
+      return;
+    }
+
+    pairs.push({
+      id: 'p' + Date.now() + Math.random().toString(36).slice(2, 7),
+      matiere, chapitre, mode,
+      carteA, carteB, image,
+      font: currentStyle.font, color: currentStyle.color,
+      createdAt: new Date().toISOString()
+    });
+
+    if (savePairs()) {
+      const k = deckKey(matiere, chapitre);
+      logMemoryActivity(matiere, chapitre, pairs.filter(p => deckKey(p.matiere, p.chapitre) === k).length);
+      showAddFeedback('Paire ajoutée.', false);
+      carteAInput.value = ''; carteBInput.value = '';
+      imageUrlInput.value = ''; imageFileInput.value = '';
+      pendingImageData = null;
+      carteAInput.focus();
+      renderAll();
+    } else {
+      pairs.pop();
+    }
+  });
+
+  document.getElementById('clearFormBtn').addEventListener('click', () => {
+    carteAInput.value = ''; carteBInput.value = '';
+    imageUrlInput.value = ''; imageFileInput.value = '';
+    pendingImageData = null;
+    addFeedback.hidden = true;
+    carteAInput.focus();
+  });
+
+  // ============ liste des paires ============
+  const pairList = document.getElementById('pairList');
+  const deckCount = document.getElementById('deckCount');
+  const deckActions = document.getElementById('deckActions');
+
+  function currentDeckPairs() {
+    const k = deckKey(matiereInput.value, chapitreInput.value);
+    return pairs.filter(p => deckKey(p.matiere, p.chapitre) === k);
+  }
+
+  function renderPairList() {
+    const liste = currentDeckPairs();
+    deckCount.textContent = liste.length;
+    deckActions.hidden = liste.length === 0;
+
+    if (liste.length === 0) {
+      pairList.innerHTML = '<div class="empty-msg">Aucune paire dans ce jeu pour l\'instant. Ajoutez-en une ci-dessus.</div>';
+      attachHoverReadAll(pairList);
+      return;
+    }
+    pairList.innerHTML = liste.map(p => `
+      <div class="pair-item">
+        <div class="pair-a" style="font-family:${escapeAttr(p.font)}; color:${escapeAttr(p.color)};">${escapeHtml(p.carteA || '(image seule)')}</div>
+        ${p.mode === 'association' ? `<div class="pair-b" style="font-family:${escapeAttr(p.font)};">↔ ${escapeHtml(p.carteB)}</div>` : '<div class="pair-b">↔ (paire identique)</div>'}
+        ${p.image ? '<div class="pair-img">🖼️ Contient une image</div>' : ''}
+        <div class="pair-actions">
+          <button type="button" class="mini-btn danger" data-del="${p.id}">✕ Supprimer</button>
+        </div>
+      </div>
+    `).join('');
+    pairList.querySelectorAll('[data-del]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (!confirm('Supprimer définitivement cette paire ?')) return;
+        pairs = pairs.filter(p => p.id !== btn.dataset.del);
+        savePairs(); renderAll();
+      });
+    });
+    attachHoverReadAll(pairList);
+  }
+
+  // ============ liste des jeux ============
+  function tousLesJeux() {
+    const map = new Map();
+    pairs.forEach(p => {
+      const k = deckKey(p.matiere, p.chapitre);
+      if (!map.has(k)) map.set(k, { matiere: p.matiere, chapitre: p.chapitre, paires: [] });
+      map.get(k).paires.push(p);
+    });
+    return [...map.values()];
+  }
+
+  function renderDeckListInto(elId, dataAttr, icone, onClick) {
+    const jeux = tousLesJeux();
+    const el = document.getElementById(elId);
+    if (jeux.length === 0) {
+      el.innerHTML = `<div class="empty-msg">${elId === 'playDeckList' ? 'Créez d\'abord des paires dans l\'onglet « Créer mes paires ».' : 'Aucun jeu pour l\'instant.'}</div>`;
+      attachHoverReadAll(el);
+      return;
+    }
+    el.innerHTML = jeux.map((j, i) => `
+      <button type="button" class="deck-item" data-${dataAttr}="${i}">
+        <div class="deck-info">
+          ${j.matiere ? `<span class="deck-tag" style="background:${matiereColor(j.matiere)}">${escapeHtml(j.matiere)}</span>` : ''}
+          <div class="deck-name">${escapeHtml(deckLabel(j.matiere, j.chapitre))}</div>
+          <div class="deck-count">${j.paires.length} paire${j.paires.length > 1 ? 's' : ''} — ${j.paires.length * 2} cartes</div>
+        </div>
+        <span aria-hidden="true">${icone}</span>
+      </button>
+    `).join('');
+    el.querySelectorAll(`[data-${dataAttr}]`).forEach(btn => {
+      btn.addEventListener('click', () => onClick(jeux[parseInt(btn.dataset[dataAttr], 10)]));
+    });
+    attachHoverReadAll(el);
+  }
+
+  function renderDeckList() {
+    renderDeckListInto('deckList', 'deck', '→', (j) => {
+      matiereInput.value = j.matiere || '';
+      chapitreInput.value = j.chapitre || '';
+      renderAll();
+      matiereInput.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'center' });
+    });
+  }
+  function renderPlayDeckList() {
+    renderDeckListInto('playDeckList', 'play', '🎮', (j) => {
+      demarrerPartie(j.paires, deckLabel(j.matiere, j.chapitre));
+    });
+  }
+
+  function reduceMotion() {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  function renderMatieresDatalist() {
+    const distinctes = [...new Set(pairs.map(p => (p.matiere || '').trim()).filter(Boolean))];
+    document.getElementById('matieresListe').innerHTML = distinctes.map(m => `<option value="${escapeAttr(m)}">`).join('');
+  }
+
+  function renderAll() {
+    renderPairList(); renderDeckList(); renderMatieresDatalist(); renderPlayDeckList();
+  }
+
+  matiereInput.addEventListener('input', renderPairList);
+  chapitreInput.addEventListener('input', renderPairList);
+
+  // ============ actions sur le jeu courant ============
+  document.getElementById('deleteDeckBtn').addEventListener('click', () => {
+    const liste = currentDeckPairs();
+    if (liste.length === 0) return;
+    if (!confirm(`Supprimer définitivement ce jeu et ses ${liste.length} paire(s) ?`)) return;
+    const k = deckKey(matiereInput.value, chapitreInput.value);
+    pairs = pairs.filter(p => deckKey(p.matiere, p.chapitre) !== k);
+    savePairs(); renderAll();
+  });
+
+  function telecharger(contenu, nomFichier) {
+    const blob = new Blob(['\ufeff' + contenu], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = nomFichier;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  document.getElementById('exportBtn').addEventListener('click', () => {
+    const liste = currentDeckPairs();
+    if (liste.length === 0) return;
+    const lignes = ['carte A;carte B;image'];
+    liste.forEach(p => {
+      const img = (p.image && p.image.startsWith('http')) ? p.image : '';
+      lignes.push([p.carteA, p.mode === 'association' ? p.carteB : '', img]
+        .map(v => String(v).replace(/;/g, ',').replace(/\r?\n/g, ' ')).join(';'));
+    });
+    telecharger(lignes.join('\n'), `memory-${(chapitreInput.value || matiereInput.value || 'jeu').replace(/[^a-zA-Z0-9-_]/g, '_')}.csv`);
+  });
+
+  document.getElementById('playThisBtn').addEventListener('click', () => {
+    const liste = currentDeckPairs();
+    if (liste.length === 0) return;
+    document.querySelector('.tab-btn[data-tab="jouer"]').click();
+    demarrerPartie(liste, deckLabel(matiereInput.value, chapitreInput.value));
+  });
+
+  // ============ le jeu ============
+  let tiles = [];
+  let firstPick = null;
+  let lockBoard = false;
+  let matchedCount = 0;
+  let tries = 0;
+  let currentGamePairs = [];
+  let currentGameTitle = '';
+
+  const gameZone = document.getElementById('gameZone');
+  const gameDone = document.getElementById('gameDone');
+  const board = document.getElementById('board');
+
+  function demarrerPartie(paires, titre) {
+    currentGamePairs = paires.slice();
+    currentGameTitle = titre;
+    // deux cartes par paire, melangees
+    tiles = [];
+    paires.forEach(p => {
+      tiles.push({ pairId: p.id, face: 'A', texte: p.carteA, image: p.image, font: p.font, color: p.color, mode: p.mode });
+      tiles.push({
+        pairId: p.id, face: 'B',
+        texte: p.mode === 'identique' ? p.carteA : p.carteB,
+        // en mode identique l'image apparait sur les deux cartes ; en association, sur la carte A seulement
+        image: p.mode === 'identique' ? p.image : '',
+        font: p.font, color: p.color, mode: p.mode
+      });
+    });
+    for (let i = tiles.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [tiles[i], tiles[j]] = [tiles[j], tiles[i]];
+    }
+    firstPick = null; lockBoard = false; matchedCount = 0; tries = 0;
+    gameZone.hidden = false; gameDone.hidden = true;
+    document.getElementById('gameTitle').textContent = '🎮 ' + titre;
+    renderBoard();
+    majStats();
+    gameZone.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' });
+  }
+
+  function renderBoard() {
+    // colonnes adaptees au nombre de cartes et a la largeur d'ecran
+    const n = tiles.length;
+    const colonnes = n <= 8 ? 2 : (n <= 18 ? 3 : 4);
+    board.style.gridTemplateColumns = `repeat(${colonnes}, 1fr)`;
+
+    board.innerHTML = tiles.map((t, i) => `
+      <button type="button" class="tile" data-index="${i}" aria-label="Carte ${i + 1}, face cachée">
+        <span class="tile-back" aria-hidden="true">🎴</span>
+        <span class="tile-content">
+          ${t.image ? `<img class="tile-img" src="${escapeAttr(t.image)}" alt="">` : ''}
+          ${t.texte ? `<span class="tile-text" data-custom-font="1" style="font-family:${escapeAttr(t.font)}; color:${escapeAttr(t.color)};">${escapeHtml(t.texte)}</span>` : ''}
+        </span>
+      </button>
+    `).join('');
+
+    board.querySelectorAll('.tile').forEach(btn => {
+      btn.addEventListener('click', () => retournerTuile(parseInt(btn.dataset.index, 10)));
+      // les images qui refusent de s'afficher ne doivent pas laisser une carte vide
+      const img = btn.querySelector('.tile-img');
+      if (img) {
+        img.addEventListener('error', () => {
+          img.remove();
+          const contenu = btn.querySelector('.tile-content');
+          if (!contenu.querySelector('.tile-text')) {
+            const err = document.createElement('span');
+            err.className = 'tile-img-error';
+            err.textContent = '⚠️ image indisponible';
+            contenu.appendChild(err);
+          }
+        });
+      }
+    });
+    attachHoverReadAll(board);
+  }
+
+  function majStats() {
+    document.getElementById('statPairs').textContent = `${matchedCount} / ${currentGamePairs.length} paires`;
+    document.getElementById('statTries').textContent = `${tries} essai${tries > 1 ? 's' : ''}`;
+  }
+
+  function retournerTuile(index) {
+    if (lockBoard) return;
+    const btn = board.querySelector(`[data-index="${index}"]`);
+    if (!btn || btn.classList.contains('matched') || btn.classList.contains('revealed')) return;
+
+    const t = tiles[index];
+    btn.classList.add('revealed');
+    btn.setAttribute('aria-label', `Carte ${index + 1}, ${t.texte || 'image'}`);
+
+    if (firstPick === null) {
+      firstPick = index;
+      return;
+    }
+    if (firstPick === index) return;
+
+    tries++;
+    majStats();
+    const premier = tiles[firstPick];
+    const btnPremier = board.querySelector(`[data-index="${firstPick}"]`);
+
+    if (premier.pairId === t.pairId) {
+      btn.classList.remove('revealed'); btn.classList.add('matched');
+      btnPremier.classList.remove('revealed'); btnPremier.classList.add('matched');
+      matchedCount++;
+      majStats();
+      announceLive(`Paire trouvée : ${premier.texte || 'image'} et ${t.texte || 'image'}. ${matchedCount} sur ${currentGamePairs.length}.`);
+      firstPick = null;
+      if (matchedCount === currentGamePairs.length) {
+        setTimeout(terminerPartie, 600);
+      }
+    } else {
+      lockBoard = true;
+      announceLive('Ce n\'est pas une paire.');
+      setTimeout(() => {
+        btn.classList.remove('revealed');
+        btnPremier.classList.remove('revealed');
+        btn.setAttribute('aria-label', `Carte ${index + 1}, face cachée`);
+        btnPremier.setAttribute('aria-label', `Carte ${firstPick + 1}, face cachée`);
+        firstPick = null; lockBoard = false;
+      }, reduceMotion() ? 700 : 1100);
+    }
+  }
+
+  function terminerPartie() {
+    gameZone.hidden = true;
+    gameDone.hidden = false;
+    const parfait = tries === currentGamePairs.length;
+    document.getElementById('gameDoneText').textContent =
+      `Vous avez retrouvé les ${currentGamePairs.length} paires en ${tries} essai${tries > 1 ? 's' : ''}.` +
+      (parfait ? ' Sans aucune erreur, bravo !' : '');
+    logMemoryActivity(
+      currentGamePairs[0] ? currentGamePairs[0].matiere : '',
+      currentGamePairs[0] ? currentGamePairs[0].chapitre : '',
+      currentGamePairs.length
+    );
+    announceLive('Partie terminée. Toutes les paires ont été trouvées.');
+    gameDone.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'center' });
+  }
+
+  document.getElementById('restartGameBtn').addEventListener('click', () => demarrerPartie(currentGamePairs, currentGameTitle));
+  document.getElementById('doneRestartBtn').addEventListener('click', () => demarrerPartie(currentGamePairs, currentGameTitle));
+  document.getElementById('otherGameBtn').addEventListener('click', () => {
+    gameZone.hidden = true; gameDone.hidden = true;
+    document.getElementById('playDeckList').scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'center' });
+  });
+  document.getElementById('doneOtherBtn').addEventListener('click', () => {
+    gameZone.hidden = true; gameDone.hidden = true;
+    document.getElementById('playDeckList').scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'center' });
+  });
+
+  // ============ import ============
+  const importFile = document.getElementById('importFile');
+  const importFeedback = document.getElementById('importFeedback');
+  const importBtn = document.getElementById('importBtn');
+  let pairesAImporter = [];
+
+  function showImportFeedback(msg, isError) {
+    importFeedback.textContent = msg;
+    importFeedback.className = 'import-preview' + (isError ? ' error' : '');
+    importFeedback.hidden = false;
+    attachHoverRead(importFeedback);
+  }
+
+  document.getElementById('downloadTemplateBtn').addEventListener('click', () => {
+    const modele = [
+      'carte A;carte B;image',
+      '1789;Prise de la Bastille;',
+      '1792;Proclamation de la République;',
+      '1804;Sacre de Napoléon;'
+    ].join('\n');
+    telecharger(modele, 'modele-memory.csv');
+  });
+
+  importFile.addEventListener('change', () => {
+    const file = importFile.files && importFile.files[0];
+    pairesAImporter = []; importBtn.disabled = true;
+    if (!file) { importFeedback.hidden = true; return; }
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const texte = String(ev.target.result || '');
+      const lignes = texte.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      if (lignes.length === 0) { showImportFeedback('Ce fichier est vide.', true); return; }
+
+      let debut = 0;
+      const premiere = lignes[0].toLowerCase();
+      if (premiere.startsWith('carte a;') || premiere.startsWith('carte a,') || premiere.startsWith('recto;')) debut = 1;
+
+      const separateur = lignes[debut] && lignes[debut].includes(';') ? ';' : ',';
+      const mode = document.getElementById('importMode').value;
+      const rejetees = [];
+      lignes.slice(debut).forEach((ligne, i) => {
+        const parts = ligne.split(separateur);
+        const a = (parts[0] || '').trim();
+        const b = (parts[1] || '').trim();
+        const image = (parts[2] || '').trim();
+        if (!a) { rejetees.push(debut + i + 1); return; }
+        if (mode === 'association' && !b) { rejetees.push(debut + i + 1); return; }
+        pairesAImporter.push({ carteA: a, carteB: mode === 'identique' ? a : b, image, mode });
+      });
+
+      if (pairesAImporter.length === 0) {
+        showImportFeedback(mode === 'association'
+          ? "Aucune paire valide. En mode question / réponse, chaque ligne doit contenir DEUX colonnes séparées par un point-virgule."
+          : "Aucune paire valide. Chaque ligne doit contenir au moins un mot.", true);
+        return;
+      }
+      let msg = `${pairesAImporter.length} paire${pairesAImporter.length > 1 ? 's' : ''} prête${pairesAImporter.length > 1 ? 's' : ''} à importer (${pairesAImporter.length * 2} cartes).`;
+      if (rejetees.length > 0) msg += ` ${rejetees.length} ligne(s) ignorée(s) : ligne ${rejetees.slice(0, 5).join(', ')}${rejetees.length > 5 ? '…' : ''}.`;
+      showImportFeedback(msg, false);
+      importBtn.disabled = false;
+    };
+    reader.onerror = () => showImportFeedback("Ce fichier n'a pas pu être lu.", true);
+    reader.readAsText(file, 'UTF-8');
+  });
+
+  document.getElementById('importMode').addEventListener('change', () => {
+    // relancer l'analyse si un fichier est deja choisi : le mode change les lignes valides
+    if (importFile.files && importFile.files[0]) importFile.dispatchEvent(new Event('change'));
+  });
+
+  importBtn.addEventListener('click', () => {
+    const matiere = document.getElementById('importMatiere').value.trim();
+    const chapitre = document.getElementById('importChapitre').value.trim();
+    if (!matiere && !chapitre) {
+      showImportFeedback('Indiquez au moins une matière ou un chapitre avant d\'importer.', true);
+      document.getElementById('importMatiere').focus();
+      return;
+    }
+    if (pairesAImporter.length === 0) return;
+
+    const avant = pairs.length;
+    pairesAImporter.forEach((p, i) => {
+      pairs.push({
+        id: 'p' + Date.now() + i + Math.random().toString(36).slice(2, 7),
+        matiere, chapitre, mode: p.mode,
+        carteA: p.carteA, carteB: p.carteB, image: p.image || '',
+        font: currentStyle.font, color: currentStyle.color,
+        createdAt: new Date().toISOString()
+      });
+    });
+
+    if (savePairs()) {
+      logMemoryActivity(matiere, chapitre, pairesAImporter.length);
+      showImportFeedback(`${pairesAImporter.length} paire(s) importée(s) dans « ${deckLabel(matiere, chapitre)} ».`, false);
+      matiereInput.value = matiere; chapitreInput.value = chapitre;
+      pairesAImporter = []; importFile.value = ''; importBtn.disabled = true;
+      renderAll();
+    } else {
+      pairs.length = avant;
+    }
+  });
+
+  // ============ init ============
+  applyModeToForm();
+  renderColorSwatches();
+  renderAll();
+  attachHoverReadAll();
+})();
+</script>
+
+</body>
+</html>
